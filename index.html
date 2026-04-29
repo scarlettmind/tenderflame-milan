@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TENDERFLAME — MILANO 2026</title>
+  <meta name="description" content="Tenderflame at Salone del Mobile 2026 — Six flame sculptures unveiled in Milan. Touch to ignite.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #050302;
+      --warm: #0d0803;
+      --flame: #ff4e00;
+      --amber: #ffaa00;
+      --gold: #c48f3a;
+      --cream: #f0ebe0;
+      --muted: rgba(240,235,224,0.45);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ─── FIRE CANVAS ──────────────────────────────────── */
+    #fire-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── NAV ──────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      padding: 2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      mix-blend-mode: normal;
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 16px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--cream);
+    }
+
+    .nav-tag {
+      font-size: 10px;
+      letter-spacing: 0.45em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    /* ─── HERO ─────────────────────────────────────────── */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(255,80,0,0.18) 0%, transparent 70%);
+      pointer-events: none;
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    .hero-overline {
+      font-size: 10px;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: rise 1.4s cubic-bezier(0.16,1,0.3,1) 0.4s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(64px, 11vw, 150px);
+      line-height: 0.88;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      animation: rise 1.6s cubic-bezier(0.16,1,0.3,1) 0.8s forwards;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-underline {
+      margin-top: 3rem;
+      font-size: 10px;
+      letter-spacing: 0.65em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      animation: rise 1.4s cubic-bezier(0.16,1,0.3,1) 1.4s forwards;
+    }
+
+    .hero-cta {
+      position: absolute;
+      bottom: 3.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      animation: rise 1s ease 2s forwards;
+    }
+
+    .hero-cta span {
+      font-size: 9px;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .hero-line {
+      width: 1px;
+      height: 56px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: pulse-line 2.5s ease-in-out infinite;
+    }
+
+    /* ─── INTRO TEXT ───────────────────────────────────── */
+    .intro {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 10rem 2rem;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .intro.visible { opacity: 1; transform: translateY(0); }
+
+    .intro p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(22px, 2.5vw, 34px);
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .intro p strong {
+      color: var(--cream);
+      font-style: normal;
+      font-weight: 300;
+    }
+
+    /* ─── PRODUCTS ─────────────────────────────────────── */
+    .product {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 5rem 6rem;
+      gap: 5rem;
+      position: relative;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .product.visible { opacity: 1; transform: translateY(0); }
+
+    .product::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 6rem; right: 6rem;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(196,143,58,0.25), transparent);
+    }
+
+    .product.reverse { direction: rtl; }
+    .product.reverse .product-figure,
+    .product.reverse .product-copy { direction: ltr; }
+
+    /* ── product image ── */
+    .product-figure {
+      position: relative;
+      cursor: crosshair;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 50vh;
+      user-select: none;
+    }
+
+    .product-figure img {
+      width: 90%;
+      max-height: 62vh;
+      object-fit: contain;
+      filter: drop-shadow(0 0 30px rgba(255,80,0,0.1));
+      transition: filter 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
+    }
+
+    .product-figure:hover img {
+      filter: drop-shadow(0 0 60px rgba(255,100,0,0.3));
+      transform: scale(1.03) translateY(-4px);
+    }
+
+    .product-figure .touch-hint {
+      position: absolute;
+      bottom: -1.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: rgba(196,143,58,0.5);
+      white-space: nowrap;
+      pointer-events: none;
+      transition: color 0.4s;
+    }
+
+    .product-figure:hover .touch-hint {
+      color: rgba(196,143,58,0.9);
+    }
+
+    /* ── product copy ── */
+    .product-copy { padding: 1rem 0; }
+
+    .product-index {
+      font-size: 10px;
+      letter-spacing: 0.45em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .product-rule {
+      width: 36px;
+      height: 1px;
+      background: var(--gold);
+      margin-bottom: 1.6rem;
+    }
+
+    .product-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(40px, 4.5vw, 72px);
+      line-height: 0.95;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.01em;
+    }
+
+    .product-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(17px, 1.6vw, 24px);
+      color: var(--gold);
+      margin-bottom: 2rem;
+      line-height: 1.35;
+    }
+
+    .product-desc {
+      font-size: 13px;
+      line-height: 2;
+      color: var(--muted);
+      max-width: 380px;
+      margin-bottom: 2.8rem;
+    }
+
+    .product-meta {
+      display: flex;
+      gap: 3rem;
+      align-items: baseline;
+    }
+
+    .product-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 22px;
+      color: rgba(240,235,224,0.5);
+      letter-spacing: 0.05em;
+    }
+
+    .product-badge {
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(196,143,58,0.35);
+      padding: 5px 12px;
+    }
+
+    /* ─── MANIFESTO ────────────────────────────────────── */
+    .manifesto {
+      padding: 12rem 6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+      position: relative;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+    }
+
+    .manifesto.visible { opacity: 1; transform: translateY(0); }
+
+    .manifesto::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 6rem; right: 6rem;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(196,143,58,0.25), transparent);
+    }
+
+    .manifesto-label {
+      font-size: 10px;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4rem;
+    }
+
+    .manifesto-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(38px, 5.5vw, 84px);
+      line-height: 1.05;
+      max-width: 900px;
+    }
+
+    .manifesto-text em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    /* ─── OUTRO ────────────────────────────────────────── */
+    .outro {
+      min-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 8rem 4rem;
+      position: relative;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .outro.visible { opacity: 1; transform: translateY(0); }
+
+    .outro::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 6rem; right: 6rem;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(196,143,58,0.25), transparent);
+    }
+
+    .outro-kicker {
+      font-size: 10px;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 3rem;
+    }
+
+    .outro-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(32px, 4.5vw, 64px);
+      line-height: 1.15;
+      max-width: 750px;
+    }
+
+    .outro-quote em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .outro-brand {
+      margin-top: 4rem;
+      font-size: 10px;
+      letter-spacing: 0.6em;
+      text-transform: uppercase;
+      color: rgba(240,235,224,0.2);
+    }
+
+    /* ─── ANIMATIONS ───────────────────────────────────── */
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+      50%       { opacity: 1;   transform: translateX(-50%) scaleX(1.15); }
+    }
+
+    @keyframes pulse-line {
+      0%, 100% { opacity: 0.25; }
+      50%       { opacity: 0.9; }
+    }
+
+    /* ─── RESPONSIVE ───────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 1.5rem 2rem; }
+
+      .product {
+        grid-template-columns: 1fr;
+        padding: 5rem 2rem;
+        gap: 3rem;
+        min-height: auto;
+      }
+      .product.reverse { direction: ltr; }
+      .product::before { left: 2rem; right: 2rem; }
+
+      .product-figure { min-height: 40vh; }
+      .product-desc   { max-width: 100%; }
+
+      .manifesto { padding: 8rem 2rem; }
+      .manifesto::before { left: 2rem; right: 2rem; }
+
+      .outro { padding: 6rem 2rem; }
+      .outro::before { left: 2rem; right: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="fire-canvas"></canvas>
+
+<!-- ─── NAV ────────────────────────────────────── -->
+<nav>
+  <a class="nav-logo" href="#">Tenderflame</a>
+  <span class="nav-tag">Milano · 2026</span>
+</nav>
+
+<!-- ─── HERO ───────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <p class="hero-overline">Salone del Mobile · Fieramilano Rho · April 2026</p>
+  <h1 class="hero-title">
+    The<br>
+    <em>Revolutionary</em><br>
+    Flame
+  </h1>
+  <p class="hero-underline">Six sculptures. One element. Milano.</p>
+  <div class="hero-cta">
+    <div class="hero-line"></div>
+    <span>Touch to ignite</span>
+  </div>
+</section>
+
+<!-- ─── INTRO ──────────────────────────────────── -->
+<div class="intro">
+  <p>In the galleries of Fieramilano, Tenderflame presented six <strong>objects of controlled fire</strong> — where Norwegian precision meets the warmth of Italian light. Each piece carries a living flame. <em>Touch one.</em></p>
+</div>
+
+<!-- ─── PRODUCT 01 · RIFF 180 ─────────────────── -->
+<section class="product" id="riff">
+  <div class="product-figure">
+    <img
+      src="https://tenderflame.com/cdn/shop/files/7_3e9e9911-1f93-45b9-96c8-ba050be8938a.png?v=1771254671&width=2048"
+      alt="Riff 180 wall fireplace"
+      loading="lazy"
+    >
+    <span class="touch-hint">Touch to ignite</span>
+  </div>
+  <div class="product-copy">
+    <p class="product-index">01 — Milano 2026</p>
+    <div class="product-rule"></div>
+    <h2 class="product-name">Riff 180</h2>
+    <p class="product-tagline">A crescendo of controlled fire</p>
+    <p class="product-desc">The Riff 180 commands the wall with architectural authority. A horizontal composition of pure flame that transforms any interior into a stage. Its patented steel-wick technology delivers a clean, smoke-free burn of extraordinary steadiness.</p>
+    <div class="product-meta">
+      <span class="product-price">€ 1,799</span>
+      <span class="product-badge">Wall Fireplace</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRODUCT 02 · CONTOUR ──────────────────── -->
+<section class="product reverse" id="contour">
+  <div class="product-figure">
+    <img
+      src="https://tenderflame.com/cdn/shop/files/100175_Contour-90_-Black_Wallhanging-Fireplace_90-mm-FW_angle-1-medium.png?v=1771254607&width=1522"
+      alt="Contour wall fireplace"
+      loading="lazy"
+    >
+    <span class="touch-hint">Touch to ignite</span>
+  </div>
+  <div class="product-copy">
+    <p class="product-index">02 — Milano 2026</p>
+    <div class="product-rule"></div>
+    <h2 class="product-name">Contour</h2>
+    <p class="product-tagline">Where form follows flame</p>
+    <p class="product-desc">The Contour traces the line between sculpture and warmth. Its silhouette echoes the rolling hills beyond Tuscany — while inside, a flame of unwavering precision answers your presence with quiet radiance.</p>
+    <div class="product-meta">
+      <span class="product-price">€ 699</span>
+      <span class="product-badge">Wall Hanging</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRODUCT 03 · ALTO 90 ──────────────────── -->
+<section class="product" id="alto">
+  <div class="product-figure">
+    <img
+      src="https://tenderflame.com/cdn/shop/files/Alto_1.png?v=1771254669&width=2048"
+      alt="Alto 90 wall fireplace"
+      loading="lazy"
+    >
+    <span class="touch-hint">Touch to ignite</span>
+  </div>
+  <div class="product-copy">
+    <p class="product-index">03 — Milano 2026</p>
+    <div class="product-rule"></div>
+    <h2 class="product-name">Alto 90</h2>
+    <p class="product-tagline">Rising toward the light</p>
+    <p class="product-desc">Tall, refined, and quietly powerful — the Alto 90 redefines the vertical axis of a room. A pillar of living flame that draws the eye upward. Like the spires of the Duomo, it transforms space by simply existing within it.</p>
+    <div class="product-meta">
+      <span class="product-price">€ 699</span>
+      <span class="product-badge">Wall Fireplace</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRODUCT 04 · CYCLOFLAME WALL ─────────── -->
+<section class="product reverse" id="cycloflame">
+  <div class="product-figure">
+    <img
+      src="https://tenderflame.com/cdn/shop/files/Untitled_design_101b60ac-cedc-4acf-91c0-e1a42f40488f.png?v=1771254548&width=1080"
+      alt="Cycloflame Wall"
+      loading="lazy"
+    >
+    <span class="touch-hint">Touch to ignite</span>
+  </div>
+  <div class="product-copy">
+    <p class="product-index">04 — Milano 2026</p>
+    <div class="product-rule"></div>
+    <h2 class="product-name">Cycloflame</h2>
+    <p class="product-tagline">The eternal circle</p>
+    <p class="product-desc">A perfect geometric circle of flame. The Cycloflame Wall burns with the precision of a craftsman's compass — meditative, endlessly captivating. Control is not a feature here. It is the shape itself.</p>
+    <div class="product-meta">
+      <span class="product-price">€ 399</span>
+      <span class="product-badge">Wall Mounted</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRODUCT 05 · INDIE FREESTANDING ──────── -->
+<section class="product" id="indie">
+  <div class="product-figure">
+    <img
+      src="https://tenderflame.com/cdn/shop/files/Indie_Freestanding.png?v=1771254671&width=2048"
+      alt="Indie Freestanding fireplace"
+      loading="lazy"
+    >
+    <span class="touch-hint">Touch to ignite</span>
+  </div>
+  <div class="product-copy">
+    <p class="product-index">05 — Milano 2026</p>
+    <div class="product-rule"></div>
+    <h2 class="product-name">Indie</h2>
+    <p class="product-tagline">Independent. Untethered. Sovereign.</p>
+    <p class="product-desc">The Indie stands alone — like Milan itself. A freestanding flame sculpture that owes allegiance to no wall, no shelf, no convention. Place it anywhere. The room rearranges itself around its warmth.</p>
+    <div class="product-meta">
+      <span class="product-price">€ 1,299</span>
+      <span class="product-badge">Freestanding</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRODUCT 06 · ROCK 90 ──────────────────── -->
+<section class="product reverse" id="rock">
+  <div class="product-figure">
+    <img
+      src="https://tenderflame.com/cdn/shop/files/Rock_90.png?v=1771254611&width=2048"
+      alt="Rock 90 wall fireplace"
+      loading="lazy"
+    >
+    <span class="touch-hint">Touch to ignite</span>
+  </div>
+  <div class="product-copy">
+    <p class="product-index">06 — Milano 2026</p>
+    <div class="product-rule"></div>
+    <h2 class="product-name">Rock 90</h2>
+    <p class="product-tagline">Raw earth. Refined fire.</p>
+    <p class="product-desc">The Rock 90 honours the volcanic soul of Italian design. Its raw, textural surface holds a flame of extraordinary clarity. The primal and the precise in perfect equilibrium — a piece that belongs equally in a gallery or a home.</p>
+    <div class="product-meta">
+      <span class="product-price">€ 599</span>
+      <span class="product-badge">Wall Fireplace</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MANIFESTO ──────────────────────────────── -->
+<div class="manifesto">
+  <p class="manifesto-label">The Philosophy</p>
+  <p class="manifesto-text">
+    Control is not an added feature.<br>
+    It is the <em>starting point</em><br>
+    of our design.
+  </p>
+</div>
+
+<!-- ─── OUTRO ──────────────────────────────────── -->
+<section class="outro">
+  <p class="outro-kicker">Tenderflame — Milano 2026</p>
+  <h2 class="outro-quote">
+    Fire is not decoration.<br>
+    <em>It is presence.</em>
+  </h2>
+  <p class="outro-brand">The Revolutionary Flame · tenderflame.com</p>
+</section>
+
+<!-- ─── SCRIPT ─────────────────────────────────── -->
+<script>
+(() => {
+  // ── Fire particle system ──────────────────────────
+  const canvas = document.getElementById('fire-canvas');
+  const ctx    = canvas.getContext('2d');
+  let particles = [];
+
+  const resize = () => {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  class Particle {
+    constructor(x, y, burst = true) {
+      this.x = x;
+      this.y = y;
+
+      if (burst) {
+        this.vx   = (Math.random() - 0.5) * 6;
+        this.vy   = -(Math.random() * 9 + 4);
+        this.size = Math.random() * 16 + 8;
+        this.life = 1;
+        this.decay = Math.random() * 0.016 + 0.01;
+      } else {
+        // ambient hero flame
+        this.vx   = (Math.random() - 0.5) * 0.6;
+        this.vy   = -(Math.random() * 1.2 + 0.5);
+        this.size = Math.random() * 7 + 3;
+        this.life = 1;
+        this.decay = Math.random() * 0.008 + 0.004;
+      }
+
+      this.t = Math.random() * Math.PI * 2;
+      this.wobble = Math.random() * 0.4 + 0.1;
+      this.ws     = Math.random() * 0.08 + 0.04;
+    }
+
+    update() {
+      this.t += this.ws;
+      this.x += this.vx + Math.sin(this.t) * this.wobble;
+      this.y += this.vy;
+      this.vy   *= 0.986;
+      this.vx   *= 0.97;
+      this.life -= this.decay;
+      this.size *= 0.976;
+    }
+
+    draw() {
+      if (this.life <= 0) return;
+      let r = 255, g, b;
+      if      (this.life > 0.75) { g = Math.floor(180 + 75 * (this.life - 0.75) / 0.25); b = Math.floor(80 * (this.life - 0.75) / 0.25); }
+      else if (this.life > 0.45) { g = Math.floor(180 * (this.life - 0.45) / 0.3 + 40 * (0.75 - this.life) / 0.3); b = 0; }
+      else                       { g = Math.floor(40 * this.life / 0.45); b = 0; }
+
+      const alpha = this.life * 0.9;
+      const grd   = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+      grd.addColorStop(0,   `rgba(${r},${g},${b},${alpha})`);
+      grd.addColorStop(0.45,`rgba(255,${Math.floor(g * 0.5)},0,${alpha * 0.55})`);
+      grd.addColorStop(1,   `rgba(200,20,0,0)`);
+
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+    }
+  }
+
+  // burst on touch/click
+  const burst = (cx, cy, n = 50) => {
+    for (let i = 0; i < n; i++) particles.push(new Particle(cx, cy, true));
+    // slow large ember cloud
+    for (let i = 0; i < 12; i++) {
+      const p = new Particle(cx + (Math.random() - 0.5) * 30, cy, true);
+      p.vx   *= 0.25;
+      p.vy   *= 0.4;
+      p.size *= 2.2;
+      p.decay *= 0.45;
+      particles.push(p);
+    }
+  };
+
+  // ambient hero flame
+  const heroEl = document.querySelector('.hero');
+  let ambientTimer = setInterval(() => {
+    if (!heroEl) return;
+    const r = heroEl.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) return;
+    const cx = r.left + r.width * (0.35 + Math.random() * 0.3);
+    const cy = Math.min(r.bottom - 10, window.innerHeight - 10);
+    const p  = new Particle(cx, cy, false);
+    particles.push(p);
+  }, 80);
+
+  // animation loop
+  const loop = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  };
+  loop();
+
+  // ── bind touch/click to product figures ──────────
+  document.querySelectorAll('.product-figure').forEach(fig => {
+    const fire = (e) => {
+      e.preventDefault();
+      const touch = e.touches ? e.touches[0] : e;
+      burst(touch.clientX, touch.clientY, 55);
+      const img = fig.querySelector('img');
+      img.style.transition = 'filter 0.08s ease';
+      img.style.filter     = 'drop-shadow(0 0 90px rgba(255,130,0,0.85)) brightness(1.15)';
+      setTimeout(() => {
+        img.style.transition = 'filter 0.7s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1)';
+        img.style.filter     = 'drop-shadow(0 0 30px rgba(255,80,0,0.1))';
+      }, 700);
+    };
+    fig.addEventListener('click',      fire);
+    fig.addEventListener('touchstart', fire, { passive: false });
+  });
+
+  // ── scroll reveal ─────────────────────────────────
+  const revealTargets = document.querySelectorAll(
+    '.product, .intro, .manifesto, .outro'
+  );
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  revealTargets.forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>
